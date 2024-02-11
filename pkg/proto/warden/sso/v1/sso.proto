@@ -1,0 +1,40 @@
+syntax = "proto3";
+package wrdn.sso.v1;
+option go_package = "github.com/optclblast/biocom/pkg/proto/gen/warden/sso/v1";
+
+import "warden/user/v1/user.proto";
+
+service WardenSSOAPI {
+        rpc SignIn(SignInRequest) returns (SignInResponse);
+        rpc SignUp(SignUpRequest) returns (SignUpResponse);
+}
+
+message SignInRequest {
+        string login = 1;
+        string password = 2;
+        string organization_id = 3;
+}
+
+message SignInResponse {
+        Token token = 1;
+        wrdn.user.v1.User user = 2;
+}
+
+
+message SignUpRequest {
+        string login = 1;
+        string password = 2;
+        string name = 3;
+        string organization_name = 4;
+        string organization_id = 5;
+}
+
+message SignUpResponse {
+        Token token = 1;
+}
+
+message Token {
+        string token = 1;
+        string refresh_token = 2;
+        uint64 expires_at = 3;
+}

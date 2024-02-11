@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package garganta.storage.v1;
+option go_package = "github.com/optclblast/biocom/pkg/proto/gen/garganta/storage/v1";
+
+service GargantaStorageAPI {
+
+}
+
+message Storage {
+        string id = 1;
+        string name = 2;
+        string address = 3;
+}

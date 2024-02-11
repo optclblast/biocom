@@ -1,0 +1,34 @@
+syntax = "proto3";
+package events.v1;
+option go_package = "github.com/optclblast/biocom/pkg/proto/gen/events/v1";
+
+// Event container. At the time may be fired more than one event. 
+message Events {
+        uint64 server_time = 1;
+        string company_id = 2;
+
+        repeated Event events = 3;
+}
+
+message Event {
+        string idempotency_key = 1;
+        
+        oneof payload {
+                EventUserLogin login = 2;
+                EventUserSignedUp sign_up = 3;
+        }
+}
+
+// Event thrown by Warden service. Indicates that user logged in.
+// This event is handeled by LogstashService (TODO rename).
+message EventUserLogin {
+        string user_id = 1; 
+        string company_id = 2;
+        uint64 time = 3;
+}
+
+message EventUserSignedUp {
+        string user_id = 1;
+        string company_id = 2;
+        uint64 time = 3;
+}

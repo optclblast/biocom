@@ -1,0 +1,74 @@
+syntax = "proto3";
+package garganta.nomenclature.v1;
+option go_package = "github.com/optclblast/biocom/pkg/proto/gen/garganta/nomenclature/v1";
+
+import "garganta/storage/v1/storage.proto";
+
+service GargantaNomenclatureAPI {
+        rpc GetNomenclature(GetNomenclatureRequest) returns (GetNomenclatureResponse);
+        // todo create request 
+        // todo edit request 
+        // todo delete request 
+}
+
+message GetNomenclatureRequest {
+        repeated string ids = 1;
+}
+
+message GetNomenclatureResponse {
+        repeated Nomenclature nomenclature = 1;
+}
+
+message Nomenclature {
+        oneof nomenclature {
+                StorageObject storage_object = 1;
+                Service service = 2;
+        }
+}
+
+message StorageObject {
+        string id = 1;
+        oneof type {
+                Product product = 2;
+                AssemblyUnit assembly_unit = 3;
+                Component component = 4;
+        }
+        // todo other info
+        garganta.storage.v1.Storage storage = 5;
+        float amount = 6;
+}
+
+message Product {
+        string name = 1;
+        string id = 2;
+
+        repeated StoreObjectCompositionUnit composition = 3;
+
+        // todo
+        uint32 created_at = 5;
+        uint32 updated_at = 6;
+        uint32 deleted_at = 7;
+
+        string barcode = 8;
+}
+
+message StoreObjectCompositionUnit {
+        float amount = 1;
+        StorageObject store_object = 2;
+}
+
+message AssemblyUnit {
+        string id = 1;
+        string name = 2;
+        repeated StoreObjectCompositionUnit composition = 3;
+}
+
+message Component {
+        string id = 1;
+        string name = 2;
+}
+
+message Service {
+        string id = 1;
+        string name = 2;
+}

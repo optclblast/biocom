@@ -1,0 +1,46 @@
+version: '3.8'
+
+volumes:
+  consul-data:
+  warden-pg-data:
+
+networks:
+  nats:
+    name: nats
+
+services:
+  consul:
+    image: consul:1.15.4
+    restart: always 
+    volumes:
+      - consul-data:/consul/data
+    command: "agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0  -dev -bind=127.0.0.1"
+    ports:
+      - "8500:8500"
+  
+  warden-pg:
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_USER=warden
+      - POSTGRES_PASSWORD=warden
+      - POSTGRES_DB=warden
+    volumes:
+      - warden-pg-data:/var/lib/postgresql/data
+    ports:
+      - 5430:5432
+    healthcheck:
+      test: [ "CMD", "-U", "warden", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+  
+  nats:
+    image: nats
+    ports:
+      - "8222:8222"
+      - "4222:4222"
+    volumes:
+      - ./docker/nats-server.conf:/config.conf
+    command: "-c config.conf"

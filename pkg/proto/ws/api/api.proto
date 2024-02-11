@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "github.com/optclblast/biocom/internal/services/ws_server/api";
+
+message Request {
+          uint64 id = 1;
+          
+          oneof payload {
+                    AuthSignInRequest auth_sign_in = 2;
+                    AuthSignUpRequest auth_sign_up = 3;
+          }
+}
+
+message Response {
+          uint64 id = 1;
+          
+          oneof payload {
+                    AuthSignInRequest auth_sign_in = 2;
+                    AuthSignUpRequest auth_sign_up = 3;
+          }  
+}
+
+message AuthSignInRequest {
+          string login = 1;
+          string password = 2;
+}
+
+message AuthSignInResponse {
+        string token = 1;
+}
+
+message AuthSignUpRequest {
+          string login = 1;
+          string password = 2;
+          string name = 3;
+          string organization_name = 4;
+}
