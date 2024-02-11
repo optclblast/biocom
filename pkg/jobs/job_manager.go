@@ -10,7 +10,7 @@ type Manager interface {
 	Shutdown() error
 }
 
-type [T] Job interface {
+type Job interface {
 	JobName() string
 	JobId() string
 	Priority() int
