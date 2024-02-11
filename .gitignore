@@ -2,3 +2,4 @@ bkp
 *.dump
 internal/services/billing/_build
 *_build
+migrations

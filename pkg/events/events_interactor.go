@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/nats-io/nats.go/jetstream"
-	cntxt "github.com/optclblast/biocom/internal/services/warden/internal/lib/context"
 	eventsv1 "github.com/optclblast/biocom/pkg/proto/gen/events"
 	"google.golang.org/protobuf/proto"
 )
@@ -26,11 +25,6 @@ type eventsInteractorNats struct {
 }
 
 func (e *eventsInteractorNats) Publish(ctx context.Context, events ...Event) error {
-	companyId, err := cntxt.CompanyId(ctx)
-	if err != nil {
-		return fmt.Errorf("error fetch user id from context. %w", err)
-	}
-
 	subjectEvents := make(map[string][]*eventsv1.Event)
 
 	for _, event := range events {
@@ -45,8 +39,8 @@ func (e *eventsInteractorNats) Publish(ctx context.Context, events ...Event) err
 	for subject, protoEvents := range subjectEvents {
 		protoMessage := &eventsv1.Events{
 			ServerTime: uint64(time.Now().UnixMilli()),
-			CompanyId:  companyId,
-			Events:     protoEvents,
+			// CompanyId:  companyId,
+			Events: protoEvents,
 		}
 
 		data, err := proto.Marshal(protoMessage)

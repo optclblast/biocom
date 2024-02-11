@@ -10,7 +10,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/optclblast/biocom/internal/services/warden/internal/infrastructure/events"
-	"github.com/optclblast/biocom/internal/services/warden/internal/lib/sqlutils"
+	"github.com/optclblast/biocom/pkg/sqlutils"
 )
 
 type TransactionalOutbox interface {

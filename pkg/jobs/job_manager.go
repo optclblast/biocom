@@ -1,24 +1,22 @@
 package jobs
 
 import (
-	"context"
 	"time"
 )
 
 type Manager interface {
-	RegisterJob(Job, JobUnmashaler)
-	AddJob(Job) (id string, err error)
+	AddJob(Job) (string, error)
 	Run() error
 	Shutdown() error
 }
 
-type Job interface {
+type [T] Job interface {
 	JobName() string
 	JobId() string
 	Priority() int
 	Delay() time.Duration
 	TimeToRun() time.Duration
-	Execute(ctx context.Context) error
+	ReturnIntoQueue(params ReturnIntoQueueParams) error
 
 	Marshal() ([]byte, error)
 	Unmarshal([]byte) error
@@ -27,12 +25,13 @@ type Job interface {
 type JobUnmashaler func(b []byte) (Job, error)
 
 type JobQueue interface {
-	Add(i Job) error
-	Remove() (Job, error)
+	Push(job Job) error
+	Pop() (Job, error)
 	Close()
-	CloseRemaining() []Job
-	Closed() bool
-	Wait() (Job, error)
-	Cap() int
-	Len() int
+}
+
+type ReturnIntoQueueParams struct {
+	ErrorCode    int
+	ErrorMessage string
+	DelayedTo    time.Time
 }

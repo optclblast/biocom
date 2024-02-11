@@ -5,8 +5,8 @@ import (
 	"database/sql"
 
 	"github.com/optclblast/biocom/internal/services/warden/internal/lib/models"
-	"github.com/optclblast/biocom/internal/services/warden/internal/lib/sqlutils"
 	"github.com/optclblast/biocom/internal/services/warden/internal/usecase/repository/user"
+	"github.com/optclblast/biocom/pkg/sqlutils"
 )
 
 type UserSQL struct {
