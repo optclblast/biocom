@@ -1,16 +1,14 @@
-package nomenclature
+package models
 
 import (
 	"time"
-
-	"github.com/optclblast/biocom/internal/services/garganta/internal/models/storage"
 )
 
 type Item interface {
 	ID() string
 	ItemName() string
 	RemainingStock() float32
-	Store() storage.Storage
+	Store() Storage
 	Composition() []CompositionUnit
 }
 
@@ -38,14 +36,14 @@ func (s *StorageObject) RemainingStock() float32 {
 	return s.Amount
 }
 
-func (s *StorageObject) Store() storage.Storage {
+func (s *StorageObject) Store() Storage {
 	return s.Storage
 }
 
 type BaseNomenclatureUnit struct {
 	Id      string
 	Name    string
-	Storage storage.Storage
+	Storage Storage
 }
 
 type Product struct {

@@ -6,10 +6,12 @@ option go_package = "github.com/optclblast/biocom/internal/services/ws_server/ap
 
 message Request {
           uint64 id = 1;
+          string token = 2;
           
           oneof payload {
-                    AuthSignInRequest auth_sign_in = 2;
-                    AuthSignUpRequest auth_sign_up = 3;
+                    AuthSignInRequest auth_sign_in = 3;
+                    AuthSignUpRequest auth_sign_up = 4;
+                    SessionInitRequest session_init = 5;
           }
 }
 
@@ -19,7 +21,26 @@ message Response {
           oneof payload {
                     AuthSignInRequest auth_sign_in = 2;
                     AuthSignUpRequest auth_sign_up = 3;
+                    SessionInitResponse session_init = 4;
+                    Error error = 5;
           }  
+}
+
+message SessionInitRequest {
+        // The token may be empty if the user is not yet authorized or the session has been initialized 
+        // but the client is not yet authorized. 
+        // The token contains information about the session, user and company
+        string token = 1; 
+        string session_id = 2;
+}
+
+message SessionInitResponse {
+        // session_id is the identifier of the new session. 
+        // if the token was sent with the request and the session is active, then session_id will be empty.
+        string session_id = 1;
+
+        // if is_expired == true, then client must authorize again and get new token.
+        bool is_expired = 2;
 }
 
 message AuthSignInRequest {
@@ -36,4 +57,9 @@ message AuthSignUpRequest {
           string password = 2;
           string name = 3;
           string organization_name = 4;
+}
+
+message Error {
+        int32 code = 1;
+        string message = 2;
 }

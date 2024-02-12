@@ -1,3 +1,3 @@
-package storage
+package models
 
 type Storage interface{}

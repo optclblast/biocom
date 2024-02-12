@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "github.com/optclblast/biocom/internal/services/ws_server/api";
+
+import "google/protobuf/any.proto";
+
+message Session {
+        string id = 1;
+        string user_id = 2; 
+        string company_id = 3; 
+        map<string, google.protobuf.Any> values = 4;
+}

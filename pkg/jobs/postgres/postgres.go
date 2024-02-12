@@ -52,7 +52,7 @@ func (p *postgresJobQueue) Pop() (jobs.Job, error) {
 	var job jobs.Job
 
 	err := p.Transaction(ctx, func(ctx context.Context) error {
-		nextJobQuery := sq.Select("jobs").Column("id", "job", "ttr").
+		nextJobQuery := sq.Select("jobs").Columns("id", "job", "ttr").
 			Where(`status = 0 AND delayed_to >= now()`).
 			OrderBy("proprity DESC").Limit(1).Suffix("for update skip locked")
 

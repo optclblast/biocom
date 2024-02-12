@@ -1,8 +1,10 @@
 package nomenclature
 
 import (
+	"context"
 	"database/sql"
 
+	"github.com/optclblast/biocom/internal/services/garganta/internal/models"
 	repo "github.com/optclblast/biocom/internal/services/garganta/internal/usecase/repository/nomenclature"
 )
 
@@ -16,6 +18,7 @@ func NewRepositorySQL(db *sql.DB) repo.Repository {
 	}
 }
 
-func (r *repositorySQL) Get()    {}
-func (r *repositorySQL) Update() {}
-func (r *repositorySQL) Delete() {}
+func (r *repositorySQL) Nomenclature(ctx context.Context, params repo.NomenclatureParams) (models.Item, error)
+func (r *repositorySQL) ListNomenclature(ctx context.Context, params repo.ListNomenclatureParams) ([]models.Item, error)
+func (r *repositorySQL) UpdateNomenclature(ctx context.Context, params repo.UpdateNomenclatureParams) error
+func (r *repositorySQL) DeleteNomenclature(ctx context.Context, params repo.DeleteNomenclatureParams) error

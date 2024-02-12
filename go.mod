@@ -59,3 +59,5 @@ require (
 	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.31.0
 )
+
+require github.com/beanstalkd/go-beanstalk v0.2.0 // indirect
