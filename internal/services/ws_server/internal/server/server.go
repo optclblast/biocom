@@ -24,6 +24,7 @@ type WebsocketServer struct {
 	log                 *slog.Logger
 
 	connectionPool *session.ConnectionPool
+	sessionPool    session.SessionPool
 
 	eventCh        chan any // TODO
 	closeCh        chan os.Signal
@@ -106,6 +107,7 @@ func NewWebsocketServer(options ...WSServerOption) *WebsocketServer {
 		eventCh:             make(chan any), // TODO
 		closeCh:             sig,
 		connectionPool:      session.NewConnectionPool(),
+		sessionPool:         session.NewSessionPool(),
 		log:                 params.logger,
 		rootController:      controller,
 	}
@@ -124,7 +126,25 @@ var upgrader = websocket.Upgrader{
 }
 
 func (s *WebsocketServer) Run(ctx context.Context) error {
-	go s.stopHandler(ctx)
+	doneCh := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-s.closeCh:
+				s.log.Warn("stopped pushing workers. shutting down")
+				s.Stop()
+				doneCh <- struct{}{}
+
+			case <-ctx.Done():
+				s.log.Warn("stopped pushing workers. shutting down")
+				s.Stop()
+				doneCh <- struct{}{}
+
+			case <-time.After(8 * time.Second):
+				// todo helthcheck consul
+			}
+		}
+	}()
 
 	s.handleConnections(ctx)
 
@@ -133,6 +153,7 @@ func (s *WebsocketServer) Run(ctx context.Context) error {
 		return fmt.Errorf("error serve http. %w", err)
 	}
 
+	<-doneCh
 	return nil
 }
 
@@ -148,10 +169,6 @@ func (s *WebsocketServer) Stop() {
 
 		s.connectionPool.Put(conn)
 	}
-}
-
-func (s *WebsocketServer) Log() *slog.Logger {
-	return s.log
 }
 
 func (s *WebsocketServer) Address() string {
@@ -184,10 +201,9 @@ func (s *WebsocketServer) handleConnections(ctx context.Context) {
 		defer wsconn.Close()
 
 		conn := s.connectionPool.Get(wsconn)
-		conn.AttachContext(ctx)
 
 		conn.SetLogger(s.log.With(
-			slog.String("connection", conn.Id().String()),
+			slog.String("connection", conn.Id()),
 			slog.String("remote_addr", wsconn.RemoteAddr().String()),
 		))
 

@@ -16,7 +16,7 @@ type postgresJobQueue struct {
 	db *sql.DB
 }
 
-func NewPostgresJobQueue(db *sql.DB) jobs.JobQueue {
+func NewPostgresJobQueue(db *sql.DB) jobs.Queue {
 	return &postgresJobQueue{db}
 }
 

@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/optclblast/biocom/internal/services/ws_server/internal/usecase/controllers"
@@ -20,17 +20,17 @@ import (
 const connectionLifetime = 15 * time.Minute
 
 type Connection struct {
-	mu      *sync.RWMutex
-	log     *slog.Logger
-	id      uuid.UUID
-	conn    *websocket.Conn
+	mu         *sync.RWMutex
+	log        *slog.Logger
+	id         string
+	conn       *websocket.Conn
+	sesStorage SessionPool
+	ctxPool    reqctx.RequestContextPool
+
 	closing bool
-	pts     atomic.Uint64
 	timer   *time.Ticker
 
 	ctx        context.Context
-	reqctx     reqctx.RequestContext
-	ctxPool    reqctx.RequestContextPool
 	controller *controllers.RootController
 }
 
@@ -38,7 +38,7 @@ func (c *Connection) SetLogger(l *slog.Logger) {
 	c.log = l
 }
 
-func (c *Connection) Id() uuid.UUID {
+func (c *Connection) Id() string {
 	return c.id
 }
 
@@ -78,7 +78,7 @@ func (c *Connection) Read() {
 					return fmt.Errorf("error read from connection. %w", err)
 				}
 
-				err = c.Dispatch(data)
+				err = c.dispatch(data)
 				if err != nil {
 					return fmt.Errorf("error handle request. %w", err)
 				}
@@ -89,37 +89,51 @@ func (c *Connection) Read() {
 			if err != nil {
 
 				if websocket.IsUnexpectedCloseError(errors.Unwrap(err)) {
-					//logger.Warn("conncection %s closed by client", c.id.String())
+					c.log.Warn("conncection closed by client", slog.String("id", c.id))
+					c.Close()
 					return
 				}
 
-				//logger.Error(err)
+				c.log.Error("error handle ws message", slog.String("error", err.Error()))
 				return
 			}
 		}
 	}
 }
 
-func (c *Connection) Dispatch(b []byte) error {
+func (c *Connection) dispatch(b []byte) error {
+	var err error
+
 	c.timer.Reset(connectionLifetime)
 
 	var request *apiv1.Request = new(apiv1.Request)
-	err := proto.Unmarshal(b, request)
+	err = proto.Unmarshal(b, request)
 	if err != nil {
 		return fmt.Errorf("error unmarshal proto request message. %w", err)
 	}
 
-	ctx := c.newRequestContext(request, c.ctx)
-	defer func() {
-		c.freeRequestContext()
-	}()
+	var session Session
+	switch {
+	case request.GetSessionInit() != nil:
+		session = c.sessionInit(request)
+	default:
+		claims := make(jwt.MapClaims)
+		_, err := jwt.ParseWithClaims(request.GetToken(), claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte("REAL_SECRET"), nil // TODO
+		})
+		if err != nil {
+			return fmt.Errorf("error parse token. %w", err)
+		}
 
-	err = c.dispatchRequest(ctx)
-	if err != nil {
-		// send error
+		if sessionId, ok := claims["session_id"].(string); ok {
+			session = c.sesStorage.Get(sessionId)
+		} else {
+			session = c.sesStorage.Get("")
+		}
 	}
 
-	return nil
+	ctx := c.ctxPool.Get(request, session.Pts(), c.ctx)
+	return session.DispatchRequest(ctx)
 }
 
 func (c *Connection) Write(resp *apiv1.Response) error {
@@ -131,37 +145,14 @@ func (c *Connection) Write(resp *apiv1.Response) error {
 	return c.conn.WriteMessage(websocket.BinaryMessage, out)
 }
 
-func (c *Connection) newRequestContext(
-	req *apiv1.Request,
-	ctx context.Context,
-) reqctx.RequestContext {
-	return c.ctxPool.Get(req, c.pts.Load(), ctx)
-}
+func (c *Connection) sessionInit(req *apiv1.Request) Session {
+	sesInitReq := req.GetSessionInit()
 
-func (c *Connection) freeRequestContext() {
-	c.ctxPool.Put(c.reqctx)
-}
+	var sessionId string = sesInitReq.GetSessionId()
 
-func (c *Connection) dispatchRequest(req reqctx.RequestContext) error {
-	switch {
-	case req.Request().GetAuthSignIn() != nil:
-		return c.handle(req, c.controller.AuthController.SignIn, "sign_in")
-	case req.Request().GetAuthSignUp() != nil:
-		return c.handle(req, c.controller.AuthController.SignUp, "sign_up")
-	default:
-		return nil // todo return error
-	}
-}
-
-func (c *Connection) handle(
-	req reqctx.RequestContext,
-	handler func(req reqctx.RequestContext) (*apiv1.Response, error),
-	handlerName string,
-) error {
-	resp, err := handler(req)
-	if err != nil {
-		return fmt.Errorf("error handle request. %w", err)
+	if sesInitReq.GetSessionId() == "" {
+		sessionId = uuid.NewString()
 	}
 
-	return c.Write(resp)
+	return c.sesStorage.Get(sessionId)
 }

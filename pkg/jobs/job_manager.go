@@ -24,7 +24,7 @@ type Job interface {
 
 type JobUnmashaler func(b []byte) (Job, error)
 
-type JobQueue interface {
+type Queue interface {
 	Push(job Job) error
 	Pop() (Job, error)
 	Close()

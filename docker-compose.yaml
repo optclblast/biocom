@@ -28,7 +28,7 @@ services:
     volumes:
       - warden-pg-data:/var/lib/postgresql/data
     ports:
-      - 5430:5432
+      - 5432:5432
     healthcheck:
       test: [ "CMD", "-U", "warden", "pg_isready" ]
       interval: 5s

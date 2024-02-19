@@ -11,7 +11,7 @@ import (
 type ConnectionPool struct {
 	mu    *sync.RWMutex
 	p     sync.Pool
-	conns map[uuid.UUID]*Connection
+	conns map[string]*Connection
 }
 
 func NewConnectionPool() *ConnectionPool {
@@ -22,14 +22,14 @@ func NewConnectionPool() *ConnectionPool {
 			},
 		},
 		mu:    &sync.RWMutex{},
-		conns: make(map[uuid.UUID]*Connection),
+		conns: make(map[string]*Connection),
 	}
 }
 
 func (c *ConnectionPool) Get(wsconn *websocket.Conn) *Connection {
 	conn := c.p.Get().(*Connection)
 
-	conn.id = uuid.New()
+	conn.id = uuid.NewString()
 	conn.mu = &sync.RWMutex{}
 	conn.conn = wsconn
 	conn.ctx = context.TODO()
@@ -53,7 +53,7 @@ func (c *ConnectionPool) Put(conn *Connection) {
 	c.p.Put(conn)
 }
 
-func (c *ConnectionPool) Connections() (map[uuid.UUID]*Connection, func()) {
+func (c *ConnectionPool) Connections() (map[string]*Connection, func()) {
 	c.mu.Lock()
 	return c.conns, func() {
 		c.mu.Unlock()

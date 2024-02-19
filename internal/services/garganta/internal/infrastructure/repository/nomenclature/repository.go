@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/optclblast/biocom/internal/services/garganta/internal/models"
 	repo "github.com/optclblast/biocom/internal/services/garganta/internal/usecase/repository/nomenclature"
 )
@@ -18,7 +19,18 @@ func NewRepositorySQL(db *sql.DB) repo.Repository {
 	}
 }
 
-func (r *repositorySQL) Nomenclature(ctx context.Context, params repo.NomenclatureParams) (models.Item, error)
-func (r *repositorySQL) ListNomenclature(ctx context.Context, params repo.ListNomenclatureParams) ([]models.Item, error)
-func (r *repositorySQL) UpdateNomenclature(ctx context.Context, params repo.UpdateNomenclatureParams) error
-func (r *repositorySQL) DeleteNomenclature(ctx context.Context, params repo.DeleteNomenclatureParams) error
+func (r *repositorySQL) Nomenclature(ctx context.Context, params repo.NomenclatureParams) (models.Item, error) {
+	query := squirrel.Select("nomenclature").Columns("id")
+}
+
+func (r *repositorySQL) ListNomenclature(ctx context.Context, params repo.ListNomenclatureParams) ([]models.Item, error) {
+
+}
+
+func (r *repositorySQL) UpdateNomenclature(ctx context.Context, params repo.UpdateNomenclatureParams) error {
+
+}
+
+func (r *repositorySQL) DeleteNomenclature(ctx context.Context, params repo.DeleteNomenclatureParams) error {
+
+}

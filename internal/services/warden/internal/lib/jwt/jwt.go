@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 	"github.com/optclblast/biocom/internal/services/warden/internal/lib/models"
 )
 
@@ -17,8 +16,9 @@ func NewToken(user models.UserIdentity, duration time.Duration) (string, error) 
 	claims["uid"] = user.ID
 	claims["organization_id"] = user.OrganizationID()
 	claims["exp"] = time.Now().Add(duration).Unix()
+	claims["session_id"] = "" // todo
 
-	secret := uuid.NewString() // todo proper secret using getenv or consul config value
+	secret := "REAL_SECRET" // todo proper secret using getenv or consul config value
 
 	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
