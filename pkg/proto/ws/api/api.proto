@@ -2,28 +2,40 @@ syntax = "proto3";
 
 package v1;
 
-option go_package = "github.com/optclblast/biocom/internal/services/ws_server/api";
+option go_package = "github.com/optclblast/biocom/pkg/proto/gen/ws/api";
+
+import "ws/api/company.proto";
+import "ws/api/userv1/user.proto";
 
 message Request {
-          uint64 id = 1;
-          string token = 2;
-          
-          oneof payload {
-                    AuthSignInRequest auth_sign_in = 3;
-                    AuthSignUpRequest auth_sign_up = 4;
-                    SessionInitRequest session_init = 5;
-          }
+        uint64 id = 1;
+        string token = 2;
+        
+        oneof payload {
+                AuthSignInRequest auth_sign_in = 3;
+                AuthSignUpRequest auth_sign_up = 4;
+                SessionInitRequest session_init = 5;
+                CreateCompanyRequest create_company = 6;
+                AddEmployeeRequest add_employee = 7;
+        }
 }
 
 message Response {
-          uint64 id = 1;
-          
-          oneof payload {
-                    AuthSignInRequest auth_sign_in = 2;
-                    AuthSignUpRequest auth_sign_up = 3;
-                    SessionInitResponse session_init = 4;
-                    Error error = 5;
-          }  
+        uint64 id = 1;
+        
+        oneof payload {
+                AuthSignInRequest auth_sign_in = 2;
+                AuthSignUpRequest auth_sign_up = 3;
+                SessionInitResponse session_init = 4;
+                Error error = 5;
+                CreateCompanyResponse create_company = 6;
+                AddEmployeeResponse add_employee = 7;
+        }  
+}
+
+message Error {
+        int32 code = 1;
+        string message = 2;
 }
 
 message SessionInitRequest {
@@ -44,8 +56,8 @@ message SessionInitResponse {
 }
 
 message AuthSignInRequest {
-          string login = 1;
-          string password = 2;
+        string login = 1;
+        string password = 2;
 }
 
 message AuthSignInResponse {
@@ -53,13 +65,22 @@ message AuthSignInResponse {
 }
 
 message AuthSignUpRequest {
-          string login = 1;
-          string password = 2;
-          string name = 3;
-          string organization_name = 4;
+        string login = 1;
+        string password = 2;
+        string name = 3;
+        string organization_name = 4;
 }
 
-message Error {
-        int32 code = 1;
-        string message = 2;
+message CreateCompanyRequest {
+        v1.Company company = 1;
 }
+
+message CreateCompanyResponse {
+        v1.Company company = 1;
+}
+
+message AddEmployeeRequest {
+        user.v1.User user = 1;
+}
+
+message AddEmployeeResponse {}

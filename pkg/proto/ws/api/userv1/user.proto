@@ -1,0 +1,41 @@
+syntax = "proto3";
+package user.v1;
+option go_package = "github.com/optclblast/biocom/pkg/proto/gen/ws/api/userv1";
+
+message User {
+        string id = 1;
+        string name = 2;
+        UserInfo info = 3;
+        UserCredentials credentioals = 4;
+}       
+
+message UserInfo {
+        string info = 1;
+        repeated Position positions = 2;
+        uint64 birth_date = 3;
+        uint64 created_at = 4;
+        UserRoles roles = 5;
+}
+
+message UserCredentials {
+        string email = 1;
+        string phone = 2;
+        string password = 3;
+        string key = 4;
+}
+
+message Position {
+        string id = 1;
+        string title = 2;
+        string info = 3;
+}
+
+message UserRoles {
+        repeated Role roles = 1;
+}
+
+enum Role {
+        Owner = 0;
+        Admin = 1;
+        None = 2;
+}

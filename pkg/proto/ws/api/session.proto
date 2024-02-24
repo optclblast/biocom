@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package v1;
 
-option go_package = "github.com/optclblast/biocom/internal/services/ws_server/api";
+option go_package = "github.com/optclblast/biocom/pkg/proto/gen/ws/api";
 
 import "google/protobuf/any.proto";
 
