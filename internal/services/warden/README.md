@@ -1,0 +1,2 @@
+# Warden
+Warden is an authentication and authorization service. Warden is responsible for registration, login, company creation, adding or removing user permissions, verification activities in the system yada yada yada.
