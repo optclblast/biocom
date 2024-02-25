@@ -1,0 +1,26 @@
+syntax = "proto3";
+package cernunnos.orders.v1;
+option go_package = "github.com/optclblast/biocom/pkg/proto/gen/cernunnos/orders/v1";
+
+service CernunnosOrdersAPI {
+        rpc NewOrder(NewOrderRequest) returns (NewOrderResponse);
+        rpc GetOrders(GetOrdersRequest) returns (GetOrdersResponse);
+        rpc UpdateOrder(UpdateOrderRequest) returns (UpdateOrderResponse);
+        rpc DeleteOrders(DeleteOrdersRequest) returns (DeleteOrdersResponse);
+}
+
+message NewOrderRequest {}
+
+message NewOrderResponse {}
+
+message GetOrdersRequest {}
+
+message GetOrdersResponse {}
+
+message UpdateOrderRequest {}
+
+message UpdateOrderResponse {}
+
+message DeleteOrdersRequest {}
+
+message DeleteOrdersResponse {}
