@@ -1,9 +1,9 @@
-defmodule CernunnosGRPC.MixProject do
+defmodule CernunnosGrpc.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :cernunnos_web,
+      app: :cernunnos_grpc,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -19,7 +19,7 @@ defmodule CernunnosGRPC.MixProject do
 
   def application do
     [
-      mod: {CernunnosGRPC.Application, []},
+      mod: {CernunnosGrpc.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -32,7 +32,8 @@ defmodule CernunnosGRPC.MixProject do
       {:grpc, github: "elixir-grpc/grpc"},
       {:cowlib, "~> 2.12.0", override: true},
       {:google_protos, "~> 0.4.0"},
-      {:phoenix_live_view, ">= 0.0.0"}
+      {:phoenix_live_view, ">= 0.0.0"},
+      {:protobuf, "~> 0.12.0"}
     ]
   end
 

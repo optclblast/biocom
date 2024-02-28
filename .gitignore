@@ -3,3 +3,4 @@ bkp
 internal/services/billing/_build
 *_build
 .vscode
+internal/services/hearsay/src/*

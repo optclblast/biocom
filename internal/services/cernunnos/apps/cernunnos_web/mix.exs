@@ -57,7 +57,8 @@ defmodule CernunnosWeb.MixProject do
       {:gettext, "~> 0.20"},
       {:cernunnos, in_umbrella: true},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.7"}
+      {:plug_cowboy, "~> 2.7"},
+      {:protobuf, "~> 0.12.0"}
     ]
   end
 

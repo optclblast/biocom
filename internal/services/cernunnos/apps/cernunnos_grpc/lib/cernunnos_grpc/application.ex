@@ -1,4 +1,4 @@
-defmodule CernunnosGRPC.Application do
+defmodule CernunnosGrpc.Application do
   use Application
 
   @impl true
@@ -6,13 +6,7 @@ defmodule CernunnosGRPC.Application do
     children = [
     ]
 
-    opts = [strategy: :one_for_one, name: CernunnosGRPC.Supervisor]
+    opts = [strategy: :one_for_one, name: CernunnosGrpc.Supervisor]
     Supervisor.start_link(children, opts)
-  end
-
-  @impl true
-  def config_change(changed, _new, removed) do
-    # CernunnosWeb.Endpoint.config_change(changed, removed)
-    :ok
   end
 end
