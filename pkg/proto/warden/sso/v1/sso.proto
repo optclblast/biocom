@@ -20,7 +20,6 @@ message SignInResponse {
         wrdn.user.v1.User user = 2;
 }
 
-
 message SignUpRequest {
         string login = 1;
         string password = 2;

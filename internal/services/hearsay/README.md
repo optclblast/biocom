@@ -1,1 +1,1 @@
-Lang: Erlang
+# Hearsay messenging system

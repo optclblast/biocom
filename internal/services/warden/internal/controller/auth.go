@@ -7,10 +7,12 @@ import (
 	"slices"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/optclblast/biocom/internal/services/warden/internal/infrastructure/events"
 	txOutbox "github.com/optclblast/biocom/internal/services/warden/internal/infrastructure/transactional_outbox"
 	"github.com/optclblast/biocom/internal/services/warden/internal/lib/jwt"
 	"github.com/optclblast/biocom/internal/services/warden/internal/lib/logger"
+	"github.com/optclblast/biocom/internal/services/warden/internal/lib/models"
 	userrepo "github.com/optclblast/biocom/internal/services/warden/internal/usecase/repository/user"
 	ssov1 "github.com/optclblast/biocom/pkg/proto/gen/warden/sso/v1"
 	userv1 "github.com/optclblast/biocom/pkg/proto/gen/warden/user/v1"
@@ -55,7 +57,7 @@ func (c *AuthController) SignIn(ctx context.Context, req *ssov1.SignInRequest) (
 		return nil, fmt.Errorf("error fetch user from database. %w", err)
 	}
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("error generate password hash. %w", err)
 	}
@@ -79,7 +81,7 @@ func (c *AuthController) SignIn(ctx context.Context, req *ssov1.SignInRequest) (
 
 	if err = c.txOutbox.Append(ctx, c.eventsBuilder.UserSignIn(
 		user.Id,
-		user.OrganizationId,
+		user.CompanyId,
 		time.Now(),
 	)); err != nil {
 		return nil, fmt.Errorf("error add event into transactionsl outbox. %w", err)
@@ -117,7 +119,54 @@ func (c *AuthController) SignUp(ctx context.Context, req *ssov1.SignUpRequest) (
 		slog.String("organization_id", req.GetOrganizationId()),
 	)
 
-	return nil, nil
+	userId := uuid.NewString()
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("error generate password hash. %w", err)
+	}
+
+	log.Debug(
+		"passwords",
+		slog.Any("req_password_hash", passwordHash),
+	)
+
+	err = c.userRepository.Create(ctx, userrepo.CreateParams{
+		Id:             userId,
+		OrganizationId: req.GetOrganizationId(),
+		PasswordHash:   passwordHash,
+		CreatedAt:      time.Now(),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error create user. %w", err)
+	}
+
+	user := &models.User{
+		Id:           userId,
+		CompanyId:    req.GetOrganizationId(),
+		PasswordHash: passwordHash,
+		CreatedAt:    time.Now(),
+	}
+
+	token, err := jwt.NewToken(user, c.tokenTTL)
+	if err != nil {
+		log.Error("failed to generate token", logger.Err(err))
+		return nil, fmt.Errorf("error create new token. %w", err)
+	}
+
+	if err = c.txOutbox.Append(ctx, c.eventsBuilder.UserSignUp(
+		user.Id,
+		user.CompanyId,
+		time.Now(),
+	)); err != nil {
+		return nil, fmt.Errorf("error add event into transactionsl outbox. %w", err)
+	}
+
+	return &ssov1.SignUpResponse{
+		Token: &ssov1.Token{
+			Token: token,
+		},
+	}, nil
 }
 
 func validateSignInRequest(req *ssov1.SignInRequest) error {

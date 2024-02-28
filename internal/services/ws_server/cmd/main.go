@@ -19,7 +19,7 @@ import (
 
 func main() {
 	app := &cli.App{
-		Name:     "openerp-ws-server",
+		Name:     "biocom-ws",
 		Version:  "0.0.1a",
 		Commands: commands.Commands(),
 		Flags:    []cli.Flag{},
@@ -29,6 +29,7 @@ func main() {
 
 			consulSource := consulconf.NewSource(
 				consulconf.WithAddress("localhost:8500"),
+				consulconf.WithPrefix("ws/"),
 				consulconf.WithPrefix("warden/"),
 				consulconf.StripPrefix(true),
 			)

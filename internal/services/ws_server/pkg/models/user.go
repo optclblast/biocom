@@ -4,7 +4,7 @@ import "time"
 
 type UserIdentity interface {
 	ID() string
-	OrganizationID() string
+	CompanyID() string
 	IsDeleted() bool
 	IsAdmin() bool
 }
