@@ -18,7 +18,7 @@ import (
 
 func main() {
 	app := &cli.App{
-		Name:     "biocom",
+		Name:     "biocom-warden",
 		Version:  "0.0.1a",
 		Commands: commands.Commands(),
 		Flags:    []cli.Flag{},
