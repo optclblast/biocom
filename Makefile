@@ -44,4 +44,4 @@ cernunnos.proto:
 		--go-grpc_out=paths=source_relative:./pkg/proto/gen {} \;
 # Elixir code
 	find pkg/proto/cernunnos -iname *.proto -exec protoc -I=pkg/proto \
-		--elixir_out=plugins=grpc:./internal/services/cernunnos/apps/cernunnos_grpc/lib {} \;
+		--elixir_out=plugins=grpc:./internal/services/cernunnos/lib {} \;

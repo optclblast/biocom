@@ -63,3 +63,10 @@ services:
     volumes:
       - ./docker/nats-server.conf:/config.conf
     command: "-c config.conf"
+
+  beanstalkd:
+    context: ./docker/beanstalkd
+    target: beanstankd-builder
+  restart: always
+  ports:
+    - "11300:11300"

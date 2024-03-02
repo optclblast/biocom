@@ -1,1 +1,0 @@
--module(hearsay_sup).

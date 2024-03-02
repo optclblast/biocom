@@ -1,0 +1,11 @@
+syntax = "proto3";
+package cernunnos.orders.v1;
+option go_package = "github.com/optclblast/biocom/pkg/proto/gen/cernunnos/orders/v1";
+
+service CernunnosBillingAPI {
+        rpc NewBill(NewBillRequest) returns (NewBillResponse);
+}
+
+message NewBillRequest {}
+
+message NewBillResponse {}

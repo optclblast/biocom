@@ -1,3 +1,0 @@
-# Cernunnos
-
-**TODO: Add description**

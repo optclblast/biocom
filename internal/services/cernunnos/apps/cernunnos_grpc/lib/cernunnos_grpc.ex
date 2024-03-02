@@ -1,3 +1,0 @@
-defmodule CernunnosGrpc do
-
-end
