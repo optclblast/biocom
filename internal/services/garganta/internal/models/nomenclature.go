@@ -7,9 +7,8 @@ import (
 type Item interface {
 	ID() string
 	ItemName() string
-	RemainingStock() float32
 	Store() Storage
-	Composition() []CompositionUnit
+	ItemComposition() []CompositionUnit
 }
 
 type CompositionUnit interface {
@@ -32,12 +31,12 @@ func (s *StorageObject) ItemName() string {
 	return s.Name
 }
 
-func (s *StorageObject) RemainingStock() float32 {
-	return s.Amount
-}
-
 func (s *StorageObject) Store() Storage {
 	return s.Storage
+}
+
+func (s *StorageObject) ItemComposition() []CompositionUnit {
+	return s.Item.ItemComposition()
 }
 
 type BaseNomenclatureUnit struct {
@@ -53,6 +52,22 @@ type Product struct {
 	UpdatedAt   time.Time
 	DeletedAt   time.Time
 	Barcode     string
+}
+
+func (s *Product) ID() string {
+	return s.Id
+}
+
+func (s *Product) ItemName() string {
+	return s.Name
+}
+
+func (s *Product) Store() Storage {
+	return s.Storage
+}
+
+func (s *Product) ItemComposition() []CompositionUnit {
+	return s.Composition
 }
 
 type StoreObjectCompositionUnit struct {
@@ -71,4 +86,39 @@ type Component struct {
 
 type Service struct {
 	BaseNomenclatureUnit
+}
+
+type NomenclatureType string
+
+var (
+	UnknownType   NomenclatureType = "unknown"
+	ProductType   NomenclatureType = "product"
+	AssemblyType  NomenclatureType = "assembly_unit"
+	ComponentType NomenclatureType = "component"
+	ServiceType   NomenclatureType = "service"
+)
+
+func NewNomenclature(
+	id, companyId, name string,
+	createdAt, updatedAt, deletedAt time.Time,
+	nType NomenclatureType,
+) (Item, error) {
+	item := &StorageObject{
+		BaseNomenclatureUnit: BaseNomenclatureUnit{
+			Id:   id,
+			Name: name,
+		},
+	}
+
+	switch nType {
+	case ProductType:
+		item.Item = &Product{}
+	case AssemblyType:
+	case ComponentType:
+	case ServiceType:
+	default:
+
+	}
+
+	return nil, nil
 }

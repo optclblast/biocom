@@ -5,12 +5,12 @@ defmodule Cernunnos.Application do
 
   @impl true
   def start(_type, _args) do
-    :logger.warning("STARTING")
+    :logger.info("STARTING")
 
     children = [
       # Starts a worker by calling: Cernunnos.Worker.start_link(arg)
       {Cernunnos.Worker, []},
-      {GRPC.Server.Supervisor, [{Cernunnos.GRPC.Worker, 50051}]}
+      {GRPC.Server.Supervisor, endpoint: Cernunnos.GRPC.Orders.Server, port: 50051, start_server: true}
     ]
 
     opts = [strategy: :one_for_one, name: Cernunnos.Supervisor]

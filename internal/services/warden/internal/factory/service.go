@@ -67,7 +67,7 @@ func ProvideWardenService(config config.Config) (*service.Warden, func()) {
 
 func provideUserRepository(config *srvconf.DatabaseConfig) (user.Repository, func(), error) {
 	conn, err := sql.Open(
-		"postgres", fmt.Sprintf("host=%s port=%d user=%s "+
+		"postgres", fmt.Sprintf("host=%s port=%s user=%s "+
 			"password=%s dbname=%s sslmode=%s",
 			config.Host, config.Port, config.User,
 			config.Password, config.DBName, config.SSLMode,

@@ -1,8 +1,15 @@
+CREATE TYPE nomenclature_type AS ENUM (
+        'product', 'assembly_unit', 'component', 'service'
+);
+
 CREATE TABLE nomenclature (
   id varchar(36)  PRIMARY KEY unique,
   company_id varchar(36)  not null,
   name text,
-  created_at timestamp default CURRENT_TIMESTAMP
+  created_at timestamp default CURRENT_TIMESTAMP,
+  updated_at timestamp default CURRENT_TIMESTAMP,
+  deleted_at timestamp default null,
+  type nomenclature_type
 );
 
 create index index_nomenclature_id_company_id 

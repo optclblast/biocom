@@ -7,9 +7,10 @@ import (
 )
 
 type NomenclatureParams struct {
-	Id          string
-	CompanyId   string
-	WithDeleted bool
+	Id              string
+	CompanyId       string
+	WithDeleted     bool
+	WithComposition bool
 }
 
 type ListNomenclatureParams struct {
